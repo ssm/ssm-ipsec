@@ -1,15 +1,20 @@
 {
-  "name": "ssm-ipsec",
-  "version": "0.1.0",
-  "author": "ssm",
-  "summary": "Configure p2p IPSec",
-  "license": "Apache-2.0",
-  "source": "https://github.com/ssm/ssm-ipsec.git",
-  "project_page": "https://github.com/ssm/ssm-ipsec",
-  "issues_url": "https://github.com/ssm/ssm-ipsec/issues",
-  "dependencies": [
-    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
-  ],
-  "data_provider": null
+    "name": "ssm-ipsec",
+    "version": "0.1.0",
+    "author": "ssm",
+    "summary": "Configure p2p IPSec",
+    "license": "Apache-2.0",
+    "source": "https://github.com/ssm/ssm-ipsec.git",
+    "project_page": "https://github.com/ssm/ssm-ipsec",
+    "issues_url": "https://github.com/ssm/ssm-ipsec/issues",
+    "dependencies": [
+        {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
+    ],
+    "data_provider": null,
+    "operatingsystem_support": [
+        {
+            "operatingsystem":"CentOS",
+            "operatingsystemrelease":[ "7" ]
+        }
+    ]
 }
-
