@@ -1,32 +1,33 @@
 require 'puppetlabs_spec_helper/rake_tasks'
 require 'puppet-lint/tasks/puppet-lint'
 require 'metadata-json-lint/rake_task'
+require 'puppet-syntax/tasks/puppet-syntax'
 
 if RUBY_VERSION >= '1.9'
   require 'rubocop/rake_task'
   RuboCop::RakeTask.new
 end
 
-PuppetLint.configuration.send('disable_80chars')
-PuppetLint.configuration.relative = true
-PuppetLint.configuration.ignore_paths = ['spec/**/*.pp', 'pkg/**/*.pp']
+exclude_paths = [
+  'pkg/**/*',
+  'vendor/**/*',
+  'spec/**/*',
+]
 
-desc 'Validate manifests, templates, and ruby files'
-task :validate do
-  Dir['manifests/**/*.pp'].each do |manifest|
-    sh "puppet parser validate --noop #{manifest}"
-  end
-  Dir['spec/**/*.rb', 'lib/**/*.rb'].each do |ruby_file|
-    sh "ruby -c #{ruby_file}" unless ruby_file =~ %r{spec/fixtures}
-  end
-  Dir['templates/**/*.erb'].each do |template|
-    sh "erb -P -x -T '-' #{template} | ruby -c"
-  end
+
+PuppetLint::RakeTask.new :lint do |config|
+  config.disable_checks = ['80chars', 'documentation']
+  config.fail_on_warnings = true
+  config.ignore_paths = exclude_paths
+  config.log_format = '%{path}:%{line}:%{column}:%{check}:%{KIND}:%{message}'
+  config.relative = true
 end
+
 
 desc 'Run metadata_lint, lint, validate, and spec tests.'
-task :test do
-  [:metadata_lint, :lint, :validate, :spec].each do |test|
-    Rake::Task[test].invoke
-  end
-end
+task :test => [
+  :syntax,
+  :lint,
+  :spec,
+]
+
