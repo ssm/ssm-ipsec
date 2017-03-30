@@ -6,7 +6,7 @@ require 'puppet-syntax/tasks/puppet-syntax'
 if RUBY_VERSION >= '1.9'
   require 'rubocop/rake_task'
   RuboCop::RakeTask.new(:style) do |rubocop|
-    rubocop.options = ['-D', '--no-color']
+    rubocop.options = ['-l', '--no-color']
   end
 end
 
