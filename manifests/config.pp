@@ -1,6 +1,11 @@
-# Configure IPSec for our needs
+# This class maintains the required ipsec configuration. There are no
+# user servicable parts here. Everything is in the 'ipsec' class.
 #
-# 1: Set up Opportunistic Encryption, with null authentication.
+# This class performs the following steps to configure IPSec for our
+# needs
+#
+# 1: Set up Opportunistic Encryption, with null authentication if the
+# policies data structure exists.
 #
 # 2: Import the Puppet CA certificate, host certificate and key.
 #
