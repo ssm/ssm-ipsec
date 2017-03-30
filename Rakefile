@@ -13,23 +13,21 @@ end
 exclude_paths = [
   'pkg/**/*',
   'vendor/**/*',
-  'spec/**/*',
+  'spec/**/*'
 ]
 
-
 PuppetLint::RakeTask.new :lint do |config|
-  config.disable_checks = ['80chars', 'documentation']
+  config.disable_checks = %w(80chars documentation)
   config.fail_on_warnings = true
   config.ignore_paths = exclude_paths
   config.log_format = '%{path}:%{line}:%{column}:%{check}:%{KIND}:%{message}'
   config.relative = true
 end
 
-
 desc 'Run metadata_lint, lint, validate, and spec tests.'
-task :test => [
-  :syntax,
-  :lint,
-  :style,
-  :spec,
-]
+task test: %i(
+  syntax
+  lint
+  style
+  spec
+)
