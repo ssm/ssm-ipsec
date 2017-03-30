@@ -5,7 +5,9 @@ require 'puppet-syntax/tasks/puppet-syntax'
 
 if RUBY_VERSION >= '1.9'
   require 'rubocop/rake_task'
-  RuboCop::RakeTask.new
+  RuboCop::RakeTask.new(:style) do |rubocop|
+    rubocop.options = ['-D', '--no-color']
+  end
 end
 
 exclude_paths = [
@@ -28,6 +30,6 @@ desc 'Run metadata_lint, lint, validate, and spec tests.'
 task :test => [
   :syntax,
   :lint,
+  :style,
   :spec,
 ]
-
