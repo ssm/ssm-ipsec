@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Puppet Class: ipsec::config
+  
+    &mdash; Documentation by YARD 0.9.8
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "puppet_classes::ipsec::config";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../puppet_class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (i)</a> &raquo;
+    <span class='title'><span class='object_link'>Puppet Classes</span></span>
+     &raquo; 
+    <span class="title">ipsec::config</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="puppet_class_list_link"
+        href="../puppet_class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Puppet Class: ipsec::config</h1>
+<div class="box_info">
+  
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>
+      manifests/config.pp
+    </dd>
+  </dl>
+</div>
+
+<h2>Overview</h2>
+<div class="docstring">
+  <div class="discussion">
+    <p>This class maintains the required ipsec configuration. There are no
+user servicable parts here. Everything is in the &#39;ipsec&#39; class.</p>
+
+<p>This class performs the following steps to configure IPSec for our
+needs</p>
+
+<p>1: Set up Opportunistic Encryption, with null authentication if the
+policies data structure exists.</p>
+
+<p>2: Import the Puppet CA certificate, host certificate and key.</p>
+
+<p>3: Make peer configuration files if the peers data structure
+contains this node and at least one one other.</p>
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><div class="method_details_list">
+  <table class="source_code">
+    <tr>
+      <td>
+        <pre class="lines">
+
+
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105</pre>
+      </td>
+      <td>
+        <pre class="code"><span class="info file"># File 'manifests/config.pp', line 15</span>
+
+class ipsec::config {
+
+  include ipsec
+  $policies = $::ipsec::policies
+  $peers    = $::ipsec::peers
+
+  $bundle=&#39;/var/lib/puppet/ssl/private/puppet.pkcs12&#39;
+  $key=&quot;/var/lib/puppet/ssl/private_keys/${trusted[&#39;certname&#39;]}.pem&quot;
+  $cert=&quot;/var/lib/puppet/ssl/certs/${trusted[&#39;certname&#39;]}.pem&quot;
+  $cert_nickname=$trusted[&#39;certname&#39;]
+  $ca_cert=&#39;/var/lib/puppet/ssl/certs/ca.pem&#39;
+  $ca_nickname=&#39;PuppetCA&#39;
+
+  File {
+    owner =&gt; &#39;root&#39;,
+    group =&gt; &#39;root&#39;,
+    mode  =&gt; &#39;0644&#39;,
+  }
+
+  Exec {
+    path =&gt; [ &#39;/usr/sbin&#39;, &#39;/usr/bin&#39; ]
+  }
+
+  file { &#39;/etc/ipsec.d/opportunistic-encryption.conf&#39;:
+    ensure  =&gt; file,
+    content =&gt; epp(&#39;ipsec/opportunistic-encryption.conf&#39;)
+  }
+
+  file { &#39;/etc/ipsec.d/ipsec.secrets&#39;:
+    ensure  =&gt; file,
+    content =&gt; epp(&#39;ipsec/ipsec.secrets&#39;)
+  }
+
+  exec { &quot;${module_name} import puppet ca cert&quot;:
+    command =&gt; &quot;certutil -A -a -i ${ca_cert} -d sql:/etc/ipsec.d -n &#39;${ca_nickname}&#39; -t &#39;CT,,&#39;&quot;,
+    unless  =&gt; &quot;certutil -L -d sql:/etc/ipsec.d -n &#39;${ca_nickname}&#39;&quot;,
+  }
+
+  exec { &quot;${module_name} export puppet key/cert to pkcs12 bundle&quot;:
+    command =&gt; &quot;openssl pkcs12 -export -out ${bundle} -inkey ${key} -in ${cert} -certfile ${ca_cert} -passout pass:&quot;,
+    creates =&gt; $bundle,
+  }
+  -&gt; exec { &quot;${module_name} import puppet key/cert from pkcs12 bundle&quot;:
+    command =&gt; &quot;pk12util -d sql:/etc/ipsec.d -i ${bundle} -W &#39;&#39;&quot;,
+    unless  =&gt; &quot;certutil -d sql:/etc/ipsec.d -L -n ${trusted[&#39;certname&#39;]}&quot;
+  }
+
+
+  file { &#39;/etc/ipsec.d/policies&#39;:
+    ensure  =&gt; directory,
+    purge   =&gt; true,
+    recurse =&gt; true,
+  }
+
+  $policies.each |$policy, $prefixes| {
+    $epp_data = {prefixes =&gt; $prefixes}
+    file { &quot;/etc/ipsec.d/policies/${policy}&quot;:
+      ensure  =&gt; file,
+      content =&gt; epp(&#39;ipsec/policy&#39;, $epp_data)
+    }
+  }
+
+  # This is done twice, once for &#39;inet&#39; and once for &#39;inet6&#39;, just
+  # because nested lambdas is hard with puppet.
+  $others_inet  = $peers.filter |$peer| { $peer[&#39;name&#39;] != $::fqdn and $peer[&#39;family&#39;] == &#39;inet&#39; }
+  $others_inet6 = $peers.filter |$peer| { $peer[&#39;name&#39;] != $::fqdn and $peer[&#39;family&#39;] == &#39;inet6&#39; }
+  $self_inet    = $peers.filter |$peer| { $peer[&#39;name&#39;] == $::fqdn and $peer[&#39;family&#39;] == &#39;inet&#39; }
+  $self_inet6   = $peers.filter |$peer| { $peer[&#39;name&#39;] == $::fqdn and $peer[&#39;family&#39;] == &#39;inet6&#39; }
+
+  # IPv4 peers
+  if $self_inet =~ Array[Hash, 1] and $others_inet =~ Array[Hash, 1] {
+    $others_inet.each |$peer| {
+      $epp_data = { self =&gt; $self_inet[0], peer =&gt; $peer }
+      file { &quot;/etc/ipsec.d/${peer[&#39;family&#39;]}-${peer[&#39;name&#39;]}.conf&quot;:
+        ensure  =&gt; file,
+        content =&gt; epp(&#39;ipsec/peer&#39;, $epp_data)
+      }
+    }
+  }
+
+  # IPv6 peers
+  if $self_inet6 =~ Array[Hash, 1] and $others_inet6 =~ Array[Hash, 1] {
+    $others_inet6.each |$peer| {
+      $epp_data = { self =&gt; $self_inet6[0], peer =&gt; $peer }
+      file { &quot;/etc/ipsec.d/${peer[&#39;family&#39;]}-${peer[&#39;name&#39;]}.conf&quot;:
+        ensure  =&gt; file,
+        content =&gt; epp(&#39;ipsec/peer&#39;, $epp_data)
+      }
+    }
+  }
+}</pre>
+      </td>
+    </tr>
+  </table>
+</div>
+</div>
+
+      <div id="footer">
+  Generated on Thu Mar 30 13:46:19 2017 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.8 (ruby-2.3.3).
+</div>
+
+    </div>
+  </body>
+</html>
