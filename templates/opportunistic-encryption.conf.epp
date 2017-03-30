@@ -1,0 +1,19 @@
+# /etc/ipsec.d/bitbit.conf
+#
+# Opportunstic Encryption without authentication. Encrypt all traffic to
+# networks in /etc/ipsec.d/policies/private
+
+conn private
+  left=%defaultroute
+  leftid=%null
+
+  right=%opportunisticgroup
+  rightid=%null
+
+  ikev2=insist
+  authby=null
+
+  failureshunt=drop
+  negotiationshunt=hold
+
+  auto=ondemand

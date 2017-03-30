@@ -1,0 +1,18 @@
+<%- |
+  Hash[Enum['name','address'], String] $self,
+  Hash[Enum['name','address'], String] $peer,
+| -%>
+# This file is managed by Puppet
+conn <%= $self['name'] %>::<%= $peer['name'] %>
+  ikev2=insist
+  authby=rsasig
+  auto=route
+
+  left=<%= $self['address'] %>
+  leftcert=<%= $self['name'] %>
+  leftid=%fromcert
+  leftrsasigkey=%cert
+
+  right=<%= $peer['address'] %>
+  rightid=%fromcert
+  rightrsasigkey=%cert

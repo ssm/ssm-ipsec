@@ -1,0 +1,7 @@
+<%- |
+  Array[String] $prefixes,
+    | -%>
+# This file is managed by Puppet
+<%- $prefixes.each |$prefix| { -%>
+<%= $prefix %>
+<% } -%>
