@@ -29,9 +29,6 @@ Limitations
 
 Not everything is implemented yet.
 
-Opportunistic IPSec
-~~~~~~~~~~~~~~~~~~~
-
 Opportunistic IPSec has some limitations.
 
 - strongSwan `does not support Opportunistic IPSec
