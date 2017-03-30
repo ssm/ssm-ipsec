@@ -1,6 +1,6 @@
 class ipsec (
   Array[
-    Hash[Enum['name','address'], String]
+    Hash[Enum['address','family','name'], String]
   ] $peers = [],
   Hash[
     Enum[ 'block', 'clear', 'clear-or-private', 'private', 'private-or-clear' ],

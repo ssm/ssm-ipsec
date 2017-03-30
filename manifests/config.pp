@@ -69,19 +69,31 @@ class ipsec::config {
     }
   }
 
-  if $peers =~ Array[Hash, 2] {
-    $self   = $peers.filter |$peer| { $peer['name'] == $::fqdn }
-    $others = $peers.filter |$peer| { $peer['name'] != $::fqdn }
+  # This is done twice, once for 'inet' and once for 'inet6', just
+  # because nested lambdas is hard with puppet.
+  $others_inet  = $peers.filter |$peer| { $peer['name'] != $::fqdn and $peer['family'] == 'inet' }
+  $others_inet6 = $peers.filter |$peer| { $peer['name'] != $::fqdn and $peer['family'] == 'inet6' }
+  $self_inet    = $peers.filter |$peer| { $peer['name'] == $::fqdn and $peer['family'] == 'inet' }
+  $self_inet6   = $peers.filter |$peer| { $peer['name'] == $::fqdn and $peer['family'] == 'inet6' }
 
-    if $self =~ Array[Hash, 1] and $others =~ Array[Hash, 1]{
+  # IPv4 peers
+  if $self_inet =~ Array[Hash, 1] and $others_inet =~ Array[Hash, 1] {
+    $others_inet.each |$peer| {
+      $epp_data = { self => $self_inet[0], peer => $peer }
+      file { "/etc/ipsec.d/${peer['family']}-${peer['name']}.conf":
+        ensure  => file,
+        content => epp('ipsec/peer', $epp_data)
+      }
+    }
+  }
 
-      $others.each |$peer| {
-        $epp_data = { self => $self[0], peer => $peer }
-
-        file { "/etc/ipsec.d/${peer['name']}.conf":
-          ensure  => file,
-          content => epp('ipsec/peer', $epp_data)
-        }
+  # IPv6 peers
+  if $self_inet6 =~ Array[Hash, 1] and $others_inet6 =~ Array[Hash, 1] {
+    $others_inet6.each |$peer| {
+      $epp_data = { self => $self_inet6[0], peer => $peer }
+      file { "/etc/ipsec.d/${peer['family']}-${peer['name']}.conf":
+        ensure  => file,
+        content => epp('ipsec/peer', $epp_data)
       }
     }
   }

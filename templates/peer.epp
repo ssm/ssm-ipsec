@@ -1,9 +1,9 @@
 <%- |
-  Hash[Enum['name','address'], String] $self,
-  Hash[Enum['name','address'], String] $peer,
+  Hash[Enum['name', 'address', 'family'], String] $self,
+  Hash[Enum['name', 'address', 'family'], String] $peer,
 | -%>
 # This file is managed by Puppet
-conn <%= $self['name'] %>::<%= $peer['name'] %>
+conn <%= [$self['family'], $self['name'], $peer['name']].join('::') %>
   ikev2=insist
   authby=rsasig
   auto=route
