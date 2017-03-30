@@ -29,7 +29,23 @@ Limitations
 
 Not everything is implemented yet.
 
+Opportunistic IPSec
+~~~~~~~~~~~~~~~~~~~
+
+Opportunistic IPSec has some limitations.
+
+- strongSwan `does not support Opportunistic IPSec
+  <https://wiki.strongswan.org/issues/2160>`_ , making this a RedHat
+  OS family feature only.
+
+- The "policies" parameter sets up opportunistic IPSec, using NULL
+  authentication. Support for opportunistic IPSec with Puppet CA
+  authentication is not implemented in this puppet module yet.
+
+- Libreswan does not yet support Opportunistic IPSec on IPv6 (as of
+  2017-03-30).
+
 Development
 -----------
 
-Pull requests and patches are welcome.
+Feedback, pull requests, bug reports and patches are welcome.
