@@ -8,6 +8,9 @@
 # This modules uses 'strongswan' on the Debian OS family, and
 # 'libreswan' on the 'RedHat' OS family.
 #
+# For authentication between nodes, the Puppet TLS certificates are
+# used.
+#
 # @summary Configure IPSec for p2p transport encryption
 #
 # @example Declaring the class
