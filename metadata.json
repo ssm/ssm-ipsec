@@ -1,20 +1,33 @@
 {
-    "name": "ssm-ipsec",
-    "version": "0.1.0",
-    "author": "ssm",
-    "summary": "Configure p2p IPSec",
-    "license": "Apache-2.0",
-    "source": "https://github.com/ssm/ssm-ipsec.git",
-    "project_page": "https://github.com/ssm/ssm-ipsec",
-    "issues_url": "https://github.com/ssm/ssm-ipsec/issues",
-    "dependencies": [
-        {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
-    ],
-    "data_provider": null,
-    "operatingsystem_support": [
-        {
-            "operatingsystem":"CentOS",
-            "operatingsystemrelease":[ "7" ]
-        }
-    ]
+  "name": "ssm-ipsec",
+  "version": "0.1.0",
+  "author": "ssm",
+  "summary": "Configure p2p IPSec",
+  "license": "Apache-2.0",
+  "source": "https://github.com/ssm/ssm-ipsec.git",
+  "project_page": "https://github.com/ssm/ssm-ipsec",
+  "issues_url": "https://github.com/ssm/ssm-ipsec/issues",
+  "dependencies": [
+    {
+      "name": "puppetlabs-stdlib",
+      "version_requirement": ">= 1.0.0"
+    }
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "CentOS",
+      "operatingsystemrelease": [
+        "7"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 4.10.0 < 7.0.0"
+    }
+  ],
+  "pdk-version": "1.9.0",
+  "template-url": "file:///opt/puppetlabs/pdk/share/cache/pdk-templates.git",
+  "template-ref": "1.9.0-0-g7281db5"
 }
