@@ -46,15 +46,13 @@ describe 'ipsec' do
 
         # Inspect the first two
         it do
-          is_expected.to
-          contain_file('/etc/ipsec.d/inet6-remote1.example.com.conf')
+          is_expected.to contain_file('/etc/ipsec.d/inet6-remote1.example.com.conf')
             .with_content(%r{conn inet6::foo.example.com::remote1.example.com})
             .with_content(%r{left=2001:db8:1::1})
             .with_content(%r{right=2001:db8:2::1})
         end
         it do
-          is_expected.to
-          contain_file('/etc/ipsec.d/inet-remote1.example.com.conf')
+          is_expected.to contain_file('/etc/ipsec.d/inet-remote1.example.com.conf')
             .with_content(%r{conn inet::foo.example.com::remote1.example.com})
             .with_content(%r{left=192.0.2.1})
             .with_content(%r{right=192.0.2.2})
@@ -96,8 +94,7 @@ describe 'ipsec' do
             .with_content(%r{192.0.2.192/26})
         }
         it {
-          is_expected.not_to
-          contain_file('/etc/ipsec.d/policies/clear-or-private')
+          is_expected.not_to contain_file('/etc/ipsec.d/policies/clear-or-private')
         }
       end
     end
