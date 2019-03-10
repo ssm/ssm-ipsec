@@ -6,7 +6,7 @@
 <title>
   Puppet Class: ipsec
   
-    &mdash; Documentation by YARD 0.9.8
+    &mdash; Documentation by YARD 0.9.18
   
 </title>
 
@@ -72,39 +72,47 @@
 </div>
 
   <h2>Summary</h2>
-  Configure IPSec for p2p transport encryption
+  IPSec for host-to-host or opportunistic encryption.
 
 <h2>Overview</h2>
 <div class="docstring">
   <div class="discussion">
-    <p>ipsec puppet class</p>
-
-<p>This is a class to install and configure IPSec for peer-to-peer
-transport encryption. This can be done implicitly using
-opportunistic encryption, if the IPSec implementation supports it,
-or with explicit peer-to-peer configuration blocks.</p>
+    
+<p>Install and configure IPSec transport encryption for IPv6 or IPv4.</p>
 
 <p>This modules uses &#39;strongswan&#39; on the Debian OS family, and
 &#39;libreswan&#39; on the &#39;RedHat&#39; OS family.</p>
 
-<p>For authentication between nodes, the Puppet TLS certificates are
+<p>For authentication between peers, the Puppet TLS keys and certificates are
 used.</p>
+
+<p>When given a set of peers (including this node), this module will configure
+IPSec rules between all peers.</p>
+
+<p>Opportunistic encryption can be configure for “libreswan”. For a given
+CIDR, assign a policy (&#39;block&#39;, &#39;clear&#39;,
+&#39;clear-or-private&#39;, &#39;private&#39; or
+&#39;private-or-clear&#39;).</p>
 
   </div>
 </div>
+
+
 <div class="tags">
   
   <div class="examples">
     <p class="tag_title">Examples:</p>
     
       
-        <p class="example_title"><div class='inline'><p>Declaring the class</p>
+        <p class="example_title"><div class='inline'>
+<p>Declaring the class</p>
 </div></p>
       
       <pre class="example code"><code><span class='id identifier rubyid_include'>include</span> <span class='id identifier rubyid_ipsec'>ipsec</span></code></pre>
     
       
-        <p class="example_title"><div class='inline'><p>Using policies</p>
+        <p class="example_title"><div class='inline'>
+<p>Using policies</p>
 </div></p>
       
       <pre class="example code"><code>$policies = {
@@ -117,12 +125,14 @@ class { &#39;ipsec&#39;:
 }</code></pre>
     
       
-        <p class="example_title"><div class='inline'><p>Using peers</p>
+        <p class="example_title"><div class='inline'>
+<p>Using peers</p>
 </div></p>
       
       <pre class="example code"><code>$peers = [
-  { &#39;name&#39; =&gt; &#39;host1&#39;, &#39;address&#39; =&gt; &#39;2001:db8::1&#39;, &#39;family&#39; =&gt; &#39;inet6&#39; },
-  { &#39;name&#39; =&gt; &#39;host2&#39;, &#39;address&#39; =&gt; &#39;2001:db8::2&#39;, &#39;family&#39; =&gt; &#39;inet6&#39; },
+  { &#39;name&#39; =&gt; &#39;thishost.example.com&#39;,   &#39;address&#39; =&gt; &#39;2001:db8::1&#39;, &#39;family&#39; =&gt; &#39;inet6&#39; },
+  { &#39;name&#39; =&gt; &#39;otherhost1.example.com&#39;, &#39;address&#39; =&gt; &#39;2001:db8::2&#39;, &#39;family&#39; =&gt; &#39;inet6&#39; },
+  { &#39;name&#39; =&gt; &#39;otherhost2.example.com&#39;, &#39;address&#39; =&gt; &#39;2001:db8::3&#39;, &#39;family&#39; =&gt; &#39;inet6&#39; },
 ]
 
 class { &#39;ipsec&#39;:
@@ -147,7 +157,8 @@ class { &#39;ipsec&#39;:
       
       
         &mdash;
-        <div class='inline'><p>A list of IPSec peers.</p>
+        <div class='inline'>
+<p>A list of IPSec peers. The peer list must include the local host.</p>
 </div>
       
     </li>
@@ -159,7 +170,13 @@ class { &#39;ipsec&#39;:
       
         <span class='type'>(<tt>Hash[
     Enum[ 'block', 'clear', 'clear-or-private', 'private', 'private-or-clear' ],
-    Array[String]
+    Array[
+      Variant[
+        Stdlib::IP::Address,
+        Stdlib::IP::Address::V4::CIDR,
+        Stdlib::IP::Address::V6::CIDR,
+      ]
+    ]
   ]</tt>)</span>
       
       
@@ -167,7 +184,97 @@ class { &#39;ipsec&#39;:
       
       
         &mdash;
-        <div class='inline'><p>A list of IPSec policies for opportunistic encryption.</p>
+        <div class='inline'>
+<p>A list of IPSec policies for opportunistic encryption.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>hostname</span>
+      
+      
+        <span class='type'>(<tt>Stdlib::Fqdn</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>$trusted[&#39;certname&#39;]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The local hostname.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>package</span>
+      
+      
+        <span class='type'>(<tt>Enum['libreswan','strongswan']</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>(see module hieradata for default) The package containing the IPSec
+software.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>tls_cert_file</span>
+      
+      
+        <span class='type'>(<tt>Stdlib::Absolutepath</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>$facts[&#39;ipsec&#39;][&#39;puppet_setting&#39;][&#39;hostcert&#39;]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Path to the local host certificate.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>tls_cacert_file</span>
+      
+      
+        <span class='type'>(<tt>Stdlib::Absolutepath</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>$facts[&#39;ipsec&#39;][&#39;puppet_setting&#39;][&#39;cacert&#39;]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Path to the local CA certificate or bundle</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>tls_key_file</span>
+      
+      
+        <span class='type'>(<tt>Stdlib::Absolutepath</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>$facts[&#39;ipsec&#39;][&#39;puppet_setting&#39;][&#39;hostprivkey&#39;]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Path to the local host key.</p>
 </div>
       
     </li>
@@ -182,38 +289,86 @@ class { &#39;ipsec&#39;:
         <pre class="lines">
 
 
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58</pre>
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102</pre>
       </td>
       <td>
-        <pre class="code"><span class="info file"># File 'manifests/init.pp', line 43</span>
+        <pre class="code"><span class="info file"># File 'manifests/init.pp', line 63</span>
 
 class ipsec (
+  Enum[&#39;libreswan&#39;,&#39;strongswan&#39;] $package,
   Array[
     Hash[Enum[&#39;address&#39;,&#39;family&#39;,&#39;name&#39;], String]
   ] $peers = [],
   Hash[
     Enum[ &#39;block&#39;, &#39;clear&#39;, &#39;clear-or-private&#39;, &#39;private&#39;, &#39;private-or-clear&#39; ],
-    Array[String]
+    Array[
+      Variant[
+        Stdlib::IP::Address,
+        Stdlib::IP::Address::V4::CIDR,
+        Stdlib::IP::Address::V6::CIDR,
+      ]
+    ]
   ] $policies = {},
+  Stdlib::Fqdn $hostname = $trusted[&#39;certname&#39;],
+  Stdlib::Absolutepath $tls_cert_file   = $facts[&#39;ipsec&#39;][&#39;puppet_setting&#39;][&#39;hostcert&#39;],
+  Stdlib::Absolutepath $tls_cacert_file = $facts[&#39;ipsec&#39;][&#39;puppet_setting&#39;][&#39;cacert&#39;],
+  Stdlib::Absolutepath $tls_key_file    = $facts[&#39;ipsec&#39;][&#39;puppet_setting&#39;][&#39;hostprivkey&#39;],
 ) {
 
-  contain ::ipsec::install
-  contain ::ipsec::config
+  # Sanity checks
+  $features = lookup(&#39;ipsec::features&#39;,  Hash[String, Hash[String, Boolean]])
+
+  if (!empty($policies) and !$features[$package][&#39;opportunistic&#39;] ){
+    fail(&quot;Package ${package} does not support opportunistic encryption with policies&quot;)
+  }
+
+  class {&#39;ipsec::install&#39;:
+    package =&gt; $package,
+  }
+  class { &#39;ipsec::config&#39;:
+    hostname =&gt; $hostname,
+    peers    =&gt; $peers,
+    policies =&gt; $policies,
+  }
   contain ::ipsec::service
 
   Class[&#39;::ipsec::install&#39;] -&gt; Class[&#39;::ipsec::config&#39;] ~&gt; Class[&#39;::ipsec::service&#39;]
@@ -225,9 +380,7 @@ class ipsec (
 </div>
 
       <div id="footer">
-  Generated on Thu Mar 30 13:46:19 2017 by
-  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.8 (ruby-2.3.3).
+     Generated by <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>.
 </div>
 
     </div>
