@@ -12,16 +12,16 @@
 # 3: Make peer configuration files if the peers data structure
 # contains this node and at least one one other.
 #
-class ipsec::config {
-
-  include ipsec
-  $policies = $::ipsec::policies
-  $peers    = $::ipsec::peers
+class ipsec::config (
+  $peers,
+  $policies,
+  $hostname,
+) {
 
   $bundle='/var/lib/puppet/ssl/private/puppet.pkcs12'
-  $key="/var/lib/puppet/ssl/private_keys/${trusted['certname']}.pem"
-  $cert="/var/lib/puppet/ssl/certs/${trusted['certname']}.pem"
-  $cert_nickname=$trusted['certname']
+  $key="/var/lib/puppet/ssl/private_keys/${hostname}.pem"
+  $cert="/var/lib/puppet/ssl/certs/${hostname}.pem"
+  $cert_nickname=$hostname
   $ca_cert='/var/lib/puppet/ssl/certs/ca.pem'
   $ca_nickname='PuppetCA'
 
@@ -35,9 +35,9 @@ class ipsec::config {
     path => [ '/usr/sbin', '/usr/bin' ]
   }
 
-  file { '/etc/ipsec.d/opportunistic-encryption.conf':
+  file { '/etc/ipsec.d/oe-certificate.conf':
     ensure  => file,
-    content => epp('ipsec/opportunistic-encryption.conf')
+    content => epp('ipsec/oe-certificate.conf')
   }
 
   file { '/etc/ipsec.d/ipsec.secrets':

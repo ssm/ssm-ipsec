@@ -1,0 +1,81 @@
+# Opportunstic Encryption with certificate authentication.
+#
+# Example from https://libreswan.org/wiki/HOWTO:_Opportunistic_IPsec
+
+# /etc/ipsec.d/oe-certificate.conf
+
+conn private-or-clear
+        # Prefer IPsec, allow cleartext
+        rightrsasigkey=%cert
+        rightauth=rsasig
+        right=%opportunisticgroup
+        rightca=%same
+        left=%defaultroute
+        leftcert=yourhostname
+        leftid=%fromcert
+        narrowing=yes
+        type=tunnel
+        ikev2=insist
+        auto=ondemand
+        # tune remaining options to taste - fail fast to prevent packet loss to the app
+        negotiationshunt=drop
+        failureshunt=passthrough
+        keyingtries=1
+        retransmit-timeout=3s
+        auto=ondemand
+
+conn private
+        # IPsec mandatory
+        rightrsasigkey=%cert
+        rightauth=rsasig
+        right=%opportunisticgroup
+        rightca=%same
+        left=%defaultroute
+        leftcert=yourhostname
+        leftid=%fromcert
+        narrowing=yes
+        type=tunnel
+        ikev2=insist
+        auto=ondemand
+        # tune remaining options to taste - fail fast to prevent packet loss to the app
+        negotiationshunt=hold
+        failureshunt=drop
+        # 0 means infinite tries
+        keyingtries=0
+        retransmit-timeout=3s
+        auto=ondemand
+
+conn clear-or-private
+        # Prefer cleartext, allow IPSec
+        rightrsasigkey=%cert
+        rightauth=rsasig
+        right=%opportunisticgroup
+        rightca=%same
+        left=%defaultroute
+        leftcert=yourhostname
+        leftid=%fromcert
+        narrowing=yes
+        type=tunnel
+        ikev2=insist
+        auto=ondemand
+        # tune remaining options to taste - fail fast to prevent packet loss to the app
+        negotiationshunt=drop
+        failureshunt=passthrough
+        keyingtries=1
+        retransmit-timeout=3s
+        auto=add
+
+conn clear
+        type=passthrough
+        # temp workaround
+        #authby=never
+        left=%defaultroute
+        right=%group
+        auto=ondemand
+conn block
+        type=reject
+        # temp workaround
+        #authby=never
+        left=%defaultroute
+        right=%group
+        auto=ondemand

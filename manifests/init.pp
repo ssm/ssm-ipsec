@@ -1,17 +1,19 @@
-# ipsec puppet class
+# @summary IPSec for host-to-host or opportunistic encryption.
 #
-# This is a class to install and configure IPSec for peer-to-peer
-# transport encryption. This can be done implicitly using
-# opportunistic encryption, if the IPSec implementation supports it,
-# or with explicit peer-to-peer configuration blocks.
+# Install and configure IPSec transport encryption for IPv6 or IPv4.
 #
 # This modules uses 'strongswan' on the Debian OS family, and
 # 'libreswan' on the 'RedHat' OS family.
 #
-# For authentication between nodes, the Puppet TLS certificates are
-# used.
+# For authentication between peers, the Puppet TLS keys and
+# certificates are used.
 #
-# @summary Configure IPSec for p2p transport encryption
+# When given a set of peers (including this node), this module will
+# configure IPSec rules between all peers.
+#
+# Opportunistic encryption can be configure for "libreswan".  For a
+# given CIDR, assign a policy ('block', 'clear', 'clear-or-private',
+# 'private' or 'private-or-clear').
 #
 # @example Declaring the class
 #   include ipsec
@@ -28,30 +30,64 @@
 #
 # @example Using peers
 #   $peers = [
-#     { 'name' => 'host1', 'address' => '2001:db8::1', 'family' => 'inet6' },
-#     { 'name' => 'host2', 'address' => '2001:db8::2', 'family' => 'inet6' },
+#     { 'name' => 'thishost.example.com',   'address' => '2001:db8::1', 'family' => 'inet6' },
+#     { 'name' => 'otherhost1.example.com', 'address' => '2001:db8::2', 'family' => 'inet6' },
+#     { 'name' => 'otherhost2.example.com', 'address' => '2001:db8::3', 'family' => 'inet6' },
 #   ]
 #
 #   class { 'ipsec':
 #     peers => $peers,
 #   }
 #
-# @param peers A list of IPSec peers.
+# @param peers
+#   A list of IPSec peers.  The peer list must include the local host.
 #
-# @param policies A list of IPSec policies for opportunistic encryption.
+# @param policies
+#   A list of IPSec policies for opportunistic encryption.
+#
+# @param hostname
+#   The local hostname.
+#
+# @param package
+#   (see module hieradata for default) The package containing the
+#   IPSec software.
 #
 class ipsec (
+  Enum['libreswan','strongswan'] $package,
   Array[
     Hash[Enum['address','family','name'], String]
   ] $peers = [],
   Hash[
     Enum[ 'block', 'clear', 'clear-or-private', 'private', 'private-or-clear' ],
-    Array[String]
+    Array[
+      Variant[
+        Stdlib::IP::Address,
+        Stdlib::IP::Address::V4::CIDR,
+        Stdlib::IP::Address::V6::CIDR,
+      ]
+    ]
   ] $policies = {},
+  Stdlib::Fqdn $hostname = $trusted['certname'],
+  Stdlib::Absolutepath $tls_cert_file   = $facts['ipsec']['puppet_setting']['hostcert'],
+  Stdlib::Absolutepath $tls_cacert_file = $facts['ipsec']['puppet_setting']['cacert'],
+  Stdlib::Absolutepath $tls_key_file    = $facts['ipsec']['puppet_setting']['hostprivkey'],
 ) {
 
-  contain ::ipsec::install
-  contain ::ipsec::config
+  # Sanity checks
+  $features = lookup('ipsec::features',  Hash[String, Hash[String, Boolean]])
+
+  if (!empty($policies) and !$features[$package]['opportunistic'] ){
+    fail("Package ${package} does not support opportunistic encryption with policies")
+  }
+
+  class {'ipsec::install':
+    package => $package,
+  }
+  class { 'ipsec::config':
+    hostname => $hostname,
+    peers    => $peers,
+    policies => $policies,
+  }
   contain ::ipsec::service
 
   Class['::ipsec::install'] -> Class['::ipsec::config'] ~> Class['::ipsec::service']

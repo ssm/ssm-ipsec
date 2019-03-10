@@ -1,0 +1,6 @@
+---
+ipsec::features:
+  libreswan:
+    opportunistic: true
+  strongswan:
+    opportunistic: false

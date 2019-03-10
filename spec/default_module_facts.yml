@@ -1,0 +1,6 @@
+---
+ipsec:
+  puppet_setting:
+    hostcert: /path/to/cert
+    cacert: /path/to/cacert
+    hostprivkey: /path/to/key
