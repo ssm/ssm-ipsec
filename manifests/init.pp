@@ -52,6 +52,14 @@
 #   (see module hieradata for default) The package containing the
 #   IPSec software.
 #
+# @param tls_cert_file
+#   Path to the local host certificate.
+#
+# @param tls_cacert_file
+#   Path to the local CA certificate or bundle
+#
+# @param tls_key_file
+#   Path to the local host key.
 class ipsec (
   Enum['libreswan','strongswan'] $package,
   Array[

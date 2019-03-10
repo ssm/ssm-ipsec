@@ -12,6 +12,17 @@
 # 3: Make peer configuration files if the peers data structure
 # contains this node and at least one one other.
 #
+# @api private
+#
+# @param peers
+#   A set of peers.  See main class for documentation.
+#
+# @param policies
+#   A set of policies.  See main class for documentation.
+#
+# @param hostname
+#  The local hostname.  See main class for documentation.
+#
 class ipsec::config (
   $peers,
   $policies,
