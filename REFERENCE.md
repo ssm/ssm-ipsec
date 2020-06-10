@@ -8,12 +8,12 @@
 _Public Classes_
 
 * [`ipsec`](#ipsec): IPSec for host-to-host or opportunistic encryption.
-* [`ipsec::service`](#ipsecservice): Manage IPSec service
 
 _Private Classes_
 
 * `ipsec::config`: Configure IPSec daemon
 * `ipsec::install`: Install IPSec daemon
+* `ipsec::service`: Manage IPSec service
 
 ## Classes
 
@@ -140,9 +140,4 @@ Data type: `Stdlib::Absolutepath`
 Path to the local host key.
 
 Default value: $facts['ipsec']['puppet_setting']['hostprivkey']
-
-### ipsec::service
-
-This class maintains the required ipsec service. There are no user
-servicable parts here. Everything is in the 'ipsec' class.
 
