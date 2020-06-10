@@ -11,9 +11,11 @@
 # When given a set of peers (including this node), this module will
 # configure IPSec rules between all peers.
 #
-# Opportunistic encryption can be configure for "libreswan".  For a
-# given CIDR, assign a policy ('block', 'clear', 'clear-or-private',
-# 'private' or 'private-or-clear').
+# Opportunistic encryption can be configured for "libreswan". For a
+# given CIDR, assign a Libreswan policy ('block', 'clear',
+# 'clear-or-private', 'private' or 'private-or-clear'). For more
+# information about these policies, consult the Libreswan
+# documentation.
 #
 # @example Declaring the class
 #   include ipsec

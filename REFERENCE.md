@@ -8,12 +8,12 @@
 _Public Classes_
 
 * [`ipsec`](#ipsec): IPSec for host-to-host or opportunistic encryption.
-* [`ipsec::service`](#ipsecservice): This class maintains the required ipsec service. There are no user servicable parts here. Everything is in the 'ipsec' class.
+* [`ipsec::service`](#ipsecservice): Manage IPSec service
 
 _Private Classes_
 
-* `ipsec::config`: This class maintains the required ipsec configuration. There are no user servicable parts here. Everything is in the 'ipsec' class.  This cla
-* `ipsec::install`: This class maintains the required ipsec packages. There are no user servicable parts here. Everything is in the 'ipsec' class.
+* `ipsec::config`: Configure IPSec daemon
+* `ipsec::install`: Install IPSec daemon
 
 ## Classes
 
@@ -30,9 +30,11 @@ certificates are used.
 When given a set of peers (including this node), this module will
 configure IPSec rules between all peers.
 
-Opportunistic encryption can be configure for "libreswan".  For a
-given CIDR, assign a policy ('block', 'clear', 'clear-or-private',
-'private' or 'private-or-clear').
+Opportunistic encryption can be configured for "libreswan". For a
+given CIDR, assign a Libreswan policy ('block', 'clear',
+'clear-or-private', 'private' or 'private-or-clear'). For more
+information about these policies, consult the Libreswan
+documentation.
 
 #### Examples
 

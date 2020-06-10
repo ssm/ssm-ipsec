@@ -1,3 +1,5 @@
+# @summary Configure IPSec daemon
+#
 # This class maintains the required ipsec configuration. There are no
 # user servicable parts here. Everything is in the 'ipsec' class.
 #
