@@ -100,9 +100,12 @@ class ipsec (
     package => $package,
   }
   class { 'ipsec::config':
-    hostname => $hostname,
-    peers    => $peers,
-    policies => $policies,
+    hostname        => $hostname,
+    peers           => $peers,
+    policies        => $policies,
+    tls_cacert_file => $tls_cacert_file,
+    tls_cert_file   => $tls_cert_file,
+    tls_key_file    => $tls_key_file,
   }
   contain ::ipsec::service
 

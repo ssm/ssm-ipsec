@@ -26,16 +26,16 @@
 #  The local hostname.  See main class for documentation.
 #
 class ipsec::config (
-  $peers,
-  $policies,
-  $hostname,
+  Array $peers,
+  Hash $policies,
+  Stdlib::Fqdn $hostname,
+  Stdlib::Absolutepath $tls_key_file,
+  Stdlib::Absolutepath $tls_cert_file,
+  Stdlib::Absolutepath $tls_cacert_file,
 ) {
 
   $bundle='/var/lib/puppet/ssl/private/puppet.pkcs12'
-  $key="/var/lib/puppet/ssl/private_keys/${hostname}.pem"
-  $cert="/var/lib/puppet/ssl/certs/${hostname}.pem"
   $cert_nickname=$hostname
-  $ca_cert='/var/lib/puppet/ssl/certs/ca.pem'
   $ca_nickname='PuppetCA'
 
   File {
@@ -59,17 +59,17 @@ class ipsec::config (
   }
 
   exec { "${module_name} import puppet ca cert":
-    command => "certutil -A -a -i ${ca_cert} -d sql:/etc/ipsec.d -n '${ca_nickname}' -t 'CT,,'",
+    command => "certutil -A -a -i ${tls_cacert_file} -d sql:/etc/ipsec.d -n '${ca_nickname}' -t 'CT,,'",
     unless  => "certutil -L -d sql:/etc/ipsec.d -n '${ca_nickname}'",
   }
 
   exec { "${module_name} export puppet key/cert to pkcs12 bundle":
-    command => "openssl pkcs12 -export -out ${bundle} -inkey ${key} -in ${cert} -certfile ${ca_cert} -passout pass:",
+    command => "openssl pkcs12 -export -out ${bundle} -inkey ${tls_key_file} -in ${tls_cert_file} -certfile ${tls_cacert_file} -passout pass:",
     creates => $bundle,
   }
   -> exec { "${module_name} import puppet key/cert from pkcs12 bundle":
     command => "pk12util -d sql:/etc/ipsec.d -i ${bundle} -W ''",
-    unless  => "certutil -d sql:/etc/ipsec.d -L -n ${trusted['certname']}"
+    unless  => "certutil -d sql:/etc/ipsec.d -L -n ${hostname}"
   }
 
 
