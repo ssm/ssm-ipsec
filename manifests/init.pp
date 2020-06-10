@@ -32,9 +32,15 @@
 #
 # @example Using peers
 #   $peers = [
-#     { 'name' => 'thishost.example.com',   'address' => '2001:db8::1', 'family' => 'inet6' },
-#     { 'name' => 'otherhost1.example.com', 'address' => '2001:db8::2', 'family' => 'inet6' },
-#     { 'name' => 'otherhost2.example.com', 'address' => '2001:db8::3', 'family' => 'inet6' },
+#     { 'name'    => 'thishost.example.com',
+#       'address' => '2001:db8::1',
+#       'family'  => 'inet6' },
+#     { 'name'    => 'otherhost1.example.com',
+#       'address' => '2001:db8::2',
+#       'family'  => 'inet6' },
+#     { 'name'    => 'otherhost2.example.com',
+#       'address' => '2001:db8::3',
+#       'family'  => 'inet6' },
 #   ]
 #
 #   class { 'ipsec':
