@@ -74,7 +74,7 @@ class ipsec (
     Hash[Enum['address','family','name'], String]
   ] $peers = [],
   Hash[
-    Enum[ 'block', 'clear', 'clear-or-private', 'private', 'private-or-clear' ],
+    Enum['block', 'clear', 'clear-or-private', 'private', 'private-or-clear'],
     Array[
       Variant[
         Stdlib::IP::Address,
@@ -88,15 +88,14 @@ class ipsec (
   Stdlib::Absolutepath $tls_cacert_file = $facts['ipsec']['puppet_setting']['cacert'],
   Stdlib::Absolutepath $tls_key_file    = $facts['ipsec']['puppet_setting']['hostprivkey'],
 ) {
-
   # Sanity checks
   $features = lookup('ipsec::features',  Hash[String, Hash[String, Boolean]])
 
-  if (!empty($policies) and !$features[$package]['opportunistic'] ){
+  if (!empty($policies) and !$features[$package]['opportunistic'] ) {
     fail("Package ${package} does not support opportunistic encryption with policies")
   }
 
-  class {'ipsec::install':
+  class { 'ipsec::install':
     package => $package,
   }
   class { 'ipsec::config':
@@ -107,7 +106,7 @@ class ipsec (
     tls_cert_file   => $tls_cert_file,
     tls_key_file    => $tls_key_file,
   }
-  contain ::ipsec::service
+  contain ipsec::service
 
-  Class['::ipsec::install'] -> Class['::ipsec::config'] ~> Class['::ipsec::service']
+  Class['ipsec::install'] -> Class['ipsec::config'] ~> Class['ipsec::service']
 }

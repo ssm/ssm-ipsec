@@ -33,7 +33,6 @@ class ipsec::config (
   Stdlib::Absolutepath $tls_cert_file,
   Stdlib::Absolutepath $tls_cacert_file,
 ) {
-
   $bundle='/var/lib/puppet/ssl/private/puppet.pkcs12'
   $cert_nickname=$hostname
   $ca_nickname='PuppetCA'
@@ -45,17 +44,17 @@ class ipsec::config (
   }
 
   Exec {
-    path => [ '/usr/sbin', '/usr/bin' ]
+    path => ['/usr/sbin', '/usr/bin'],
   }
 
   file { '/etc/ipsec.d/oe-certificate.conf':
     ensure  => file,
-    content => epp('ipsec/oe-certificate.conf')
+    content => epp('ipsec/oe-certificate.conf'),
   }
 
   file { '/etc/ipsec.d/ipsec.secrets':
     ensure  => file,
-    content => epp('ipsec/ipsec.secrets')
+    content => epp('ipsec/ipsec.secrets'),
   }
 
   exec { "${module_name} import puppet ca cert":
@@ -69,9 +68,8 @@ class ipsec::config (
   }
   -> exec { "${module_name} import puppet key/cert from pkcs12 bundle":
     command => "pk12util -d sql:/etc/ipsec.d -i ${bundle} -W ''",
-    unless  => "certutil -d sql:/etc/ipsec.d -L -n ${hostname}"
+    unless  => "certutil -d sql:/etc/ipsec.d -L -n ${hostname}",
   }
-
 
   file { '/etc/ipsec.d/policies':
     ensure  => directory,
@@ -80,19 +78,19 @@ class ipsec::config (
   }
 
   $policies.each |$policy, $prefixes| {
-    $epp_data = {prefixes => $prefixes}
+    $epp_data = { prefixes => $prefixes }
     file { "/etc/ipsec.d/policies/${policy}":
       ensure  => file,
-      content => epp('ipsec/policy', $epp_data)
+      content => epp('ipsec/policy', $epp_data),
     }
   }
 
   # This is done twice, once for 'inet' and once for 'inet6', just
   # because nested lambdas is hard with puppet.
-  $others_inet  = $peers.filter |$peer| { $peer['name'] != $::fqdn and $peer['family'] == 'inet' }
-  $others_inet6 = $peers.filter |$peer| { $peer['name'] != $::fqdn and $peer['family'] == 'inet6' }
-  $self_inet    = $peers.filter |$peer| { $peer['name'] == $::fqdn and $peer['family'] == 'inet' }
-  $self_inet6   = $peers.filter |$peer| { $peer['name'] == $::fqdn and $peer['family'] == 'inet6' }
+  $others_inet  = $peers.filter |$peer| { $peer['name'] != $facts['networking']['fqdn'] and $peer['family'] == 'inet' }
+  $others_inet6 = $peers.filter |$peer| { $peer['name'] != $facts['networking']['fqdn'] and $peer['family'] == 'inet6' }
+  $self_inet    = $peers.filter |$peer| { $peer['name'] == $facts['networking']['fqdn'] and $peer['family'] == 'inet' }
+  $self_inet6   = $peers.filter |$peer| { $peer['name'] == $facts['networking']['fqdn'] and $peer['family'] == 'inet6' }
 
   # IPv4 peers
   if $self_inet =~ Array[Hash, 1] and $others_inet =~ Array[Hash, 1] {
@@ -100,7 +98,7 @@ class ipsec::config (
       $epp_data = { self => $self_inet[0], peer => $peer }
       file { "/etc/ipsec.d/${peer['family']}-${peer['name']}.conf":
         ensure  => file,
-        content => epp('ipsec/peer', $epp_data)
+        content => epp('ipsec/peer', $epp_data),
       }
     }
   }
@@ -111,7 +109,7 @@ class ipsec::config (
       $epp_data = { self => $self_inet6[0], peer => $peer }
       file { "/etc/ipsec.d/${peer['family']}-${peer['name']}.conf":
         ensure  => file,
-        content => epp('ipsec/peer', $epp_data)
+        content => epp('ipsec/peer', $epp_data),
       }
     }
   }
