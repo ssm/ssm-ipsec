@@ -82,28 +82,35 @@ class { 'ipsec':
 
 The following parameters are available in the `ipsec` class:
 
-* [`peers`](#peers)
-* [`policies`](#policies)
-* [`hostname`](#hostname)
-* [`package`](#package)
-* [`tls_cert_file`](#tls_cert_file)
-* [`tls_cacert_file`](#tls_cacert_file)
-* [`tls_key_file`](#tls_key_file)
+* [`peers`](#-ipsec--peers)
+* [`policies`](#-ipsec--policies)
+* [`hostname`](#-ipsec--hostname)
+* [`package`](#-ipsec--package)
+* [`tls_cert_file`](#-ipsec--tls_cert_file)
+* [`tls_cacert_file`](#-ipsec--tls_cacert_file)
+* [`tls_key_file`](#-ipsec--tls_key_file)
 
-##### <a name="peers"></a>`peers`
+##### <a name="-ipsec--peers"></a>`peers`
 
-Data type: `Array[
+Data type:
+
+```puppet
+Array[
     Hash[Enum['address','family','name'], String]
-  ]`
+  ]
+```
 
 A list of IPSec peers.  The peer list must include the local host.
 
 Default value: `[]`
 
-##### <a name="policies"></a>`policies`
+##### <a name="-ipsec--policies"></a>`policies`
 
-Data type: `Hash[
-    Enum[ 'block', 'clear', 'clear-or-private', 'private', 'private-or-clear' ],
+Data type:
+
+```puppet
+Hash[
+    Enum['block', 'clear', 'clear-or-private', 'private', 'private-or-clear'],
     Array[
       Variant[
         Stdlib::IP::Address,
@@ -111,13 +118,14 @@ Data type: `Hash[
         Stdlib::IP::Address::V6::CIDR,
       ]
     ]
-  ]`
+  ]
+```
 
 A list of IPSec policies for opportunistic encryption.
 
 Default value: `{}`
 
-##### <a name="hostname"></a>`hostname`
+##### <a name="-ipsec--hostname"></a>`hostname`
 
 Data type: `Stdlib::Fqdn`
 
@@ -125,14 +133,14 @@ The local hostname.
 
 Default value: `$trusted['certname']`
 
-##### <a name="package"></a>`package`
+##### <a name="-ipsec--package"></a>`package`
 
 Data type: `Enum['libreswan','strongswan']`
 
 (see module hieradata for default) The package containing the
 IPSec software.
 
-##### <a name="tls_cert_file"></a>`tls_cert_file`
+##### <a name="-ipsec--tls_cert_file"></a>`tls_cert_file`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -140,7 +148,7 @@ Path to the local host certificate.
 
 Default value: `$facts['ipsec']['puppet_setting']['hostcert']`
 
-##### <a name="tls_cacert_file"></a>`tls_cacert_file`
+##### <a name="-ipsec--tls_cacert_file"></a>`tls_cacert_file`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -148,7 +156,7 @@ Path to the local CA certificate or bundle
 
 Default value: `$facts['ipsec']['puppet_setting']['cacert']`
 
-##### <a name="tls_key_file"></a>`tls_key_file`
+##### <a name="-ipsec--tls_key_file"></a>`tls_key_file`
 
 Data type: `Stdlib::Absolutepath`
 
